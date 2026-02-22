@@ -6,6 +6,7 @@ import { useWizardStore } from "@/stores/wizard-store";
 import { WizardProgress } from "@/components/wizard/wizard-progress";
 import { ActivityCard } from "@/components/wizard/activity-card";
 import { Button } from "@/components/ui/button";
+import { ConjureLoader, DeskEmptyState } from "@/components/ui-desk";
 import type { Activity, ActivityContent } from "@/types";
 
 interface GeneratedActivity {
@@ -25,6 +26,7 @@ export default function Step3Page() {
     learningObjectives,
     generatedActivities,
     setGeneratedActivities,
+    setGenerationRequestId,
     isGenerating,
     setIsGenerating,
   } = useWizardStore();
@@ -67,7 +69,6 @@ export default function Step3Page() {
         fullText += decoder.decode(value, { stream: true });
       }
 
-      // Parse the JSON from the plain text stream response
       const jsonMatch = fullText.match(/\{[\s\S]*\}/);
       if (!jsonMatch) throw new Error("Could not parse AI response");
 
@@ -79,12 +80,10 @@ export default function Step3Page() {
           category: a.category,
           summary: a.summary,
           content: a.content,
-          isSaved: false,
           createdAt: new Date().toISOString(),
         })
       );
 
-      // Validate resource URLs server-side and remove broken links
       const allUrls = activities.flatMap(
         (a) => a.content.resources?.filter((r) => r.url).map((r) => r.url!) || []
       );
@@ -107,15 +106,44 @@ export default function Step3Page() {
             }
           }
         } catch {
-          // If validation fails, keep URLs as-is
+          // Keep URLs as-is if validation fails
         }
       }
 
       setGeneratedActivities(activities);
+
+      try {
+        const persistRes = await fetch("/api/activities/persist", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            gradeLevel,
+            subject,
+            activityType,
+            lessonInfo,
+            learningObjectives,
+            activities: activities.map((a) => ({
+              title: a.title,
+              category: a.category,
+              summary: a.summary,
+              content: a.content,
+            })),
+          }),
+        });
+        if (persistRes.ok) {
+          const { generationRequestId, activities: saved } = await persistRes.json();
+          setGenerationRequestId(generationRequestId);
+          const persisted = activities.map((a, i) => ({
+            ...a,
+            id: saved[i]?.id || a.id,
+          }));
+          setGeneratedActivities(persisted);
+        }
+      } catch {
+        console.error("Failed to persist activities to database");
+      }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "An unexpected error occurred"
-      );
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
     } finally {
       setIsGenerating(false);
     }
@@ -126,6 +154,7 @@ export default function Step3Page() {
     lessonInfo,
     learningObjectives,
     setGeneratedActivities,
+    setGenerationRequestId,
     setIsGenerating,
   ]);
 
@@ -134,7 +163,6 @@ export default function Step3Page() {
       router.push("/wizard/step-1");
       return;
     }
-
     if (!hasGenerated && generatedActivities.length === 0) {
       setHasGenerated(true);
       generate();
@@ -149,68 +177,68 @@ export default function Step3Page() {
 
       <div className="space-y-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">
-            Generated Activities
+          <p className="text-xs font-bold uppercase tracking-widest mb-1" style={{ color: "var(--desk-teal)" }}>
+            Step 3
+          </p>
+          <h1
+            className="text-2xl font-bold"
+            style={{ fontFamily: "var(--font-fraunces)", color: "var(--desk-ink)" }}
+          >
+            Your activities
           </h1>
-          <p className="mt-1 text-gray-500">
-            Here are AI-generated activities tailored to your lesson. Click any
-            activity to see full details.
+          <p className="mt-1 text-sm" style={{ color: "var(--desk-muted)" }}>
+            Four AI-crafted lesson plans tailored to your context. Click any card to see the full plan.
           </p>
         </div>
 
+        {/* Loading state */}
         {isGenerating && (
-          <div className="flex flex-col items-center justify-center py-16">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-gray-200 border-t-blue-600" />
-            <p className="mt-4 text-lg font-medium text-gray-600">
-              Generating activities...
-            </p>
-            <p className="mt-1 text-sm text-gray-400">
-              This may take 10-20 seconds
-            </p>
-          </div>
+          <ConjureLoader
+            label="Conjuring your activities…"
+            sublabel="Brewing up 4 tailored lesson plans — this takes 10–20 seconds"
+          />
         )}
 
-        {error && (
-          <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
-            <p className="text-red-800 font-medium">Error: {error}</p>
-            <Button
-              variant="outline"
-              className="mt-4"
-              onClick={() => {
-                setHasGenerated(false);
-                setGeneratedActivities([]);
-                generate();
-              }}
-            >
-              Try Again
-            </Button>
-          </div>
+        {/* Error state */}
+        {error && !isGenerating && (
+          <DeskEmptyState
+            icon="pencil"
+            heading="Something went wrong"
+            body={error}
+            actionLabel="Try again"
+            onAction={() => {
+              setHasGenerated(false);
+              setGeneratedActivities([]);
+              generate();
+            }}
+          />
         )}
 
+        {/* Results grid */}
         {!isGenerating && !error && generatedActivities.length > 0 && (
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            {generatedActivities.map((activity, index) => (
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            {generatedActivities.map((activity, i) => (
               <ActivityCard
                 key={activity.id}
                 title={activity.title}
                 category={activity.category}
                 summary={activity.summary}
-                index={index}
-                onViewDetail={() =>
-                  router.push(`/wizard/step-3/${index}`)
-                }
+                index={i}
+                onViewDetail={() => router.push(`/wizard/step-3/${activity.id}`)}
               />
             ))}
           </div>
         )}
 
-        <div className="flex justify-between">
+        {/* Nav */}
+        <div className="flex justify-between pt-2">
           <Button
             variant="outline"
             size="lg"
             onClick={() => router.push("/wizard/step-2")}
+            className="border-[var(--desk-border)] text-[var(--desk-body)] hover:bg-[var(--desk-bg)]"
           >
-            Back
+            ← Back
           </Button>
           {!isGenerating && generatedActivities.length > 0 && (
             <Button
@@ -218,11 +246,13 @@ export default function Step3Page() {
               size="lg"
               onClick={() => {
                 setGeneratedActivities([]);
+                setGenerationRequestId(null);
                 setHasGenerated(false);
                 generate();
               }}
+              className="border-[var(--desk-teal)] text-[var(--desk-teal)] hover:bg-[var(--desk-teal)]/5 gap-1.5"
             >
-              Regenerate
+              ↺ Regenerate
             </Button>
           )}
         </div>
@@ -230,3 +260,4 @@ export default function Step3Page() {
     </div>
   );
 }
+

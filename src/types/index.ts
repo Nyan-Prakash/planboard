@@ -52,8 +52,22 @@ export interface Activity {
   category: string;
   summary: string;
   content: ActivityContent;
-  isSaved: boolean;
+  isPublic?: boolean;
+  gradeLevel?: string;
+  subject?: string;
+  activityType?: string;
   createdAt: string;
+  userId?: string;
+}
+
+export interface ActivityWithStats extends Activity {
+  avgOverallRating?: number | null;
+  ratingCount?: number;
+  avgSuitability?: number | null;
+  avgGoalAchievement?: number | null;
+  avgRecommendation?: number | null;
+  isSavedByUser?: boolean;
+  authorName?: string | null;
 }
 
 export interface GenerationRequest {
@@ -65,9 +79,21 @@ export interface GenerationRequest {
 }
 
 export interface Rating {
+  id?: string;
   activityId: string;
+  userId?: string;
   suitability: number;
   goalAchievement: number;
   recommendation: number;
-  comment?: string;
+  overallRating?: number | null;
+  reviewText?: string | null;
+  comment?: string | null;
+  createdAt?: string;
+}
+
+export interface Save {
+  id: string;
+  userId: string;
+  activityId: string;
+  createdAt: string;
 }

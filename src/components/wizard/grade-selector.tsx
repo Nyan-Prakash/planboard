@@ -15,20 +15,49 @@ export function GradeSelector({ value, onChange }: GradeSelectorProps) {
         <button
           key={grade.value}
           onClick={() => onChange(grade.value)}
+          aria-pressed={value === grade.value}
           className={cn(
-            "flex flex-col items-center gap-2 rounded-xl border-2 bg-white p-6 text-center transition-all hover:shadow-md",
+            "group flex flex-col items-center gap-2 rounded-xl border-2 p-6 text-center transition-all duration-150 hover:-translate-y-0.5",
+            "bg-[var(--desk-paper)]",
             value === grade.value
-              ? "border-blue-600 bg-blue-50 shadow-md"
-              : "border-gray-200 hover:border-gray-300"
+              ? "border-[var(--desk-teal)] shadow-md shadow-[var(--desk-teal)]/10"
+              : "border-[var(--desk-border)] hover:border-[var(--desk-teal)]/40 hover:shadow-sm"
           )}
+          style={
+            value === grade.value
+              ? { background: "color-mix(in srgb, var(--desk-teal) 6%, var(--desk-paper))" }
+              : undefined
+          }
         >
           <span className="text-4xl">{grade.icon}</span>
-          <span className="text-lg font-semibold text-gray-900">
+          <span
+            className="text-base font-bold"
+            style={{
+              fontFamily: "var(--font-fraunces)",
+              color: value === grade.value ? "var(--desk-teal)" : "var(--desk-ink)",
+            }}
+          >
             {grade.label}
           </span>
-          <span className="text-sm text-gray-500">{grade.description}</span>
+          <span className="text-xs" style={{ color: "var(--desk-muted)" }}>
+            {grade.description}
+          </span>
+          {value === grade.value && (
+            <span
+              className="stamp-badge stamp-animate"
+              style={{
+                color: "var(--desk-teal)",
+                borderColor: "var(--desk-teal)",
+                background: "color-mix(in srgb, var(--desk-teal) 10%, transparent)",
+                fontSize: "0.625rem",
+              }}
+            >
+              Selected
+            </span>
+          )}
         </button>
       ))}
     </div>
   );
 }
+

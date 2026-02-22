@@ -1,11 +1,22 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Fraunces, DM_Sans } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import { Header } from "@/components/layout/header";
+import { AuthProvider } from "@/components/auth/auth-provider";
+import { createClient } from "@/lib/supabase/server";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const fraunces = Fraunces({
+  variable: "--font-fraunces",
   subsets: ["latin"],
+  axes: ["opsz"],
+  display: "swap",
+});
+
+const dmSans = DM_Sans({
+  variable: "--font-dm-sans",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 const geistMono = Geist_Mono({
@@ -14,23 +25,30 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ACTi Genie - AI Activity Generator for Teachers",
+  title: "Planboard — AI Activity Generator for Teachers",
   description:
-    "Generate engaging classroom activities from your lesson information using AI. Choose grade level, subject, and get instant activity suggestions.",
+    "Turn lesson goals into classroom-ready activities in seconds. Powered by AI, designed for K-12 teachers.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
+        className={`${fraunces.variable} ${dmSans.variable} ${geistMono.variable} paper-texture min-h-screen`}
       >
-        <Header />
-        <main className="min-h-[calc(100vh-4rem)]">{children}</main>
+        <AuthProvider initialUser={user}>
+          <Header />
+          <main className="min-h-[calc(100vh-4rem)]">{children}</main>
+        </AuthProvider>
       </body>
     </html>
   );

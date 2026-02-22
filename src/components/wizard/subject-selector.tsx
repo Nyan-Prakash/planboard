@@ -15,15 +15,27 @@ export function SubjectSelector({ value, onChange }: SubjectSelectorProps) {
         <button
           key={subject.value}
           onClick={() => onChange(subject.value)}
+          aria-pressed={value === subject.value}
           className={cn(
-            "flex flex-col items-center gap-1.5 rounded-lg border-2 bg-white p-4 text-center transition-all hover:shadow-sm",
+            "flex flex-col items-center gap-1.5 rounded-lg border-2 p-4 text-center transition-all duration-150 hover:-translate-y-0.5",
+            "bg-[var(--desk-paper)]",
             value === subject.value
-              ? "border-blue-600 bg-blue-50 shadow-sm"
-              : "border-gray-200 hover:border-gray-300"
+              ? "border-[var(--desk-teal)] shadow-sm"
+              : "border-[var(--desk-border)] hover:border-[var(--desk-teal)]/40"
           )}
+          style={
+            value === subject.value
+              ? { background: "color-mix(in srgb, var(--desk-teal) 6%, var(--desk-paper))" }
+              : undefined
+          }
         >
           <span className="text-2xl">{subject.icon}</span>
-          <span className="text-sm font-medium text-gray-900">
+          <span
+            className="text-xs font-semibold"
+            style={{
+              color: value === subject.value ? "var(--desk-teal)" : "var(--desk-ink)",
+            }}
+          >
             {subject.label}
           </span>
         </button>
@@ -31,3 +43,4 @@ export function SubjectSelector({ value, onChange }: SubjectSelectorProps) {
     </div>
   );
 }
+
