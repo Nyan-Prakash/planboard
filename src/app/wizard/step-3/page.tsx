@@ -84,6 +84,33 @@ export default function Step3Page() {
         })
       );
 
+      // Validate resource URLs server-side and remove broken links
+      const allUrls = activities.flatMap(
+        (a) => a.content.resources?.filter((r) => r.url).map((r) => r.url!) || []
+      );
+      if (allUrls.length > 0) {
+        try {
+          const validateRes = await fetch("/api/validate-urls", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ urls: allUrls }),
+          });
+          if (validateRes.ok) {
+            const { valid } = await validateRes.json();
+            const validSet = new Set(valid);
+            for (const activity of activities) {
+              if (activity.content.resources) {
+                activity.content.resources = activity.content.resources.map((r) =>
+                  r.url && !validSet.has(r.url) ? { ...r, url: undefined } : r
+                );
+              }
+            }
+          }
+        } catch {
+          // If validation fails, keep URLs as-is
+        }
+      }
+
       setGeneratedActivities(activities);
     } catch (err) {
       setError(

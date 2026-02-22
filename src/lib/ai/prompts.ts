@@ -67,7 +67,13 @@ Rules:
 - Provide at least 3-4 phases in the structure
 - Each activity should directly address the stated learning objectives
 - Be specific and practical in instructions — teachers should be able to implement immediately
-- For resources, provide REAL URLs to publicly accessible educational content (YouTube, Khan Academy, Wikipedia, PBS, National Geographic, educational .edu sites, etc.). Every resource MUST have a valid url field
+- For resources, you MUST ONLY use URLs you are highly confident actually exist. Prefer these patterns:
+  * Wikipedia: https://en.wikipedia.org/wiki/[Article_Name]
+  * Khan Academy: https://www.khanacademy.org/[subject area] (use top-level subject/topic pages only)
+  * YouTube: https://www.youtube.com/results?search_query=[search terms] (link to SEARCH results, NOT specific video IDs you might hallucinate)
+  * Major educational sites: use only the homepage or well-known landing pages (e.g. https://www.pbslearningmedia.org, https://www.nationalgeographic.org/education/)
+  * DO NOT fabricate specific article paths, video IDs, or deep links that you are not certain exist
+  * Every resource MUST have a url field
 - Do NOT include any text outside the JSON object`;
 
 export function buildUserPrompt(input: GenerateInput): string {
