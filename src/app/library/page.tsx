@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { GRADE_LEVELS, SUBJECTS } from "@/lib/constants";
 import { StampBadge, DeskEmptyState } from "@/components/ui-desk";
 import { BinderSearch } from "@/components/library/binder-search";
+import { DeleteActivityButton } from "@/components/activity/delete-activity-button";
 
 const categoryIcons: Record<string, string> = {
   debate: "🗣️",
@@ -41,7 +42,7 @@ type ActivityRow = {
   created_at: string;
 };
 
-function ActivityGrid({ activities, linkBase }: { activities: ActivityRow[]; linkBase: string }) {
+function ActivityGrid({ activities, linkBase, showDelete = false }: { activities: ActivityRow[]; linkBase: string; showDelete?: boolean }) {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {activities.map((activity, i) => {
@@ -52,45 +53,52 @@ function ActivityGrid({ activities, linkBase }: { activities: ActivityRow[]; lin
         const accentColors = ["teal", "rose", "sage", "accent"] as const;
         const accent = accentColors[i % accentColors.length];
         return (
-          <Link key={activity.id} href={`${linkBase}/${activity.id}`}>
-            <div className="paper-card h-full flex flex-col gap-3 p-4 cursor-pointer">
-              {/* top strip */}
-              <div
-                className="h-1 -mx-4 -mt-4 rounded-t-xl mb-1"
-                style={{
-                  background:
-                    accent === "teal"
-                      ? "var(--desk-teal)"
-                      : accent === "rose"
-                        ? "var(--desk-rose)"
-                        : accent === "sage"
-                          ? "var(--desk-sage)"
-                          : "var(--desk-accent)",
-                }}
-              />
-              <div className="flex items-start gap-3">
-                <span className="text-2xl leading-none mt-0.5">{icon}</span>
-                <h3 className="font-semibold text-desk-ink leading-snug line-clamp-2 text-base">
-                  {activity.title}
-                </h3>
+          <div key={activity.id} className="relative group">
+            <Link href={`${linkBase}/${activity.id}`}>
+              <div className="paper-card h-full flex flex-col gap-3 p-4 cursor-pointer">
+                {/* top strip */}
+                <div
+                  className="h-1 -mx-4 -mt-4 rounded-t-xl mb-1"
+                  style={{
+                    background:
+                      accent === "teal"
+                        ? "var(--desk-teal)"
+                        : accent === "rose"
+                          ? "var(--desk-rose)"
+                          : accent === "sage"
+                            ? "var(--desk-sage)"
+                            : "var(--desk-accent)",
+                  }}
+                />
+                <div className="flex items-start gap-3">
+                  <span className="text-2xl leading-none mt-0.5">{icon}</span>
+                  <h3 className="font-semibold text-desk-ink leading-snug line-clamp-2 text-base pr-6">
+                    {activity.title}
+                  </h3>
+                </div>
+                <p className="text-sm text-desk-body line-clamp-2 flex-1">{activity.summary}</p>
+                <div className="flex flex-wrap gap-1.5 mt-auto">
+                  <StampBadge color={accent} animateIn>
+                    {activity.category.replace(/_/g, " ")}
+                  </StampBadge>
+                  <StampBadge color="ink">{getGradeLabel(activity.grade_level)}</StampBadge>
+                  <StampBadge color="ink">{getSubjectLabel(activity.subject)}</StampBadge>
+                </div>
+                <p className="text-xs text-desk-muted">
+                  {new Date(activity.created_at).toLocaleDateString(undefined, {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
+                </p>
               </div>
-              <p className="text-sm text-desk-body line-clamp-2 flex-1">{activity.summary}</p>
-              <div className="flex flex-wrap gap-1.5 mt-auto">
-                <StampBadge color={accent} animateIn>
-                  {activity.category.replace(/_/g, " ")}
-                </StampBadge>
-                <StampBadge color="ink">{getGradeLabel(activity.grade_level)}</StampBadge>
-                <StampBadge color="ink">{getSubjectLabel(activity.subject)}</StampBadge>
+            </Link>
+            {showDelete && (
+              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                <DeleteActivityButton activityId={activity.id} activityTitle={activity.title} />
               </div>
-              <p className="text-xs text-desk-muted">
-                {new Date(activity.created_at).toLocaleDateString(undefined, {
-                  month: "short",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </p>
-            </div>
-          </Link>
+            )}
+          </div>
         );
       })}
     </div>
@@ -218,7 +226,7 @@ export default async function LibraryPage({
               <p className="text-lg" style={{ color: "var(--desk-muted)" }}>No activities match &ldquo;{params.q}&rdquo;.</p>
             </div>
           ) : (
-            <ActivityGrid activities={filteredMine} linkBase="/marketplace" />
+            <ActivityGrid activities={filteredMine} linkBase="/marketplace" showDelete />
           )}
         </TabsContent>
 
