@@ -13,6 +13,8 @@ export const ratingSchema = z.object({
   suitability: z.number().min(1).max(5),
   goalAchievement: z.number().min(1).max(5),
   recommendation: z.number().min(1).max(5),
+  overallRating: z.number().min(1).max(5).optional(),
+  reviewText: z.string().max(2000).optional(),
   comment: z.string().optional(),
 });
 

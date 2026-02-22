@@ -1,16 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { signIn } from "next-auth/react";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { PaperPage } from "@/components/ui-desk";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -21,75 +22,117 @@ export default function LoginPage() {
     setLoading(true);
     setError("");
 
-    const result = await signIn("credentials", {
+    const supabase = createClient();
+    const { error: authError } = await supabase.auth.signInWithPassword({
       email,
       password,
-      redirect: false,
     });
 
-    if (result?.error) {
-      setError("Invalid email or password");
+    if (authError) {
+      setError(authError.message);
       setLoading(false);
     } else {
-      router.push("/wizard/step-1");
+      const redirectTo = searchParams.get("redirectTo") || "/wizard/step-1";
+      router.push(redirectTo);
+      router.refresh();
     }
   };
 
   return (
-    <div className="flex items-center justify-center px-4 py-16">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <div className="mx-auto mb-2 flex h-12 w-12 items-center justify-center rounded-lg bg-linear-to-br from-blue-600 to-purple-600 text-white font-bold">
-            AG
+    <div className="flex items-center justify-center px-4 py-16 min-h-[80vh]">
+      <PaperPage className="w-full max-w-md">
+        {/* Brand mark */}
+        <div className="text-center mb-8">
+          <div
+            className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl text-white text-xl select-none"
+            style={{ background: "var(--desk-teal)" }}
+          >
+            ✦
           </div>
-          <CardTitle className="text-2xl">Welcome Back</CardTitle>
-          <p className="text-sm text-gray-500">
-            Sign in to your ACTi Genie account
+          <h1
+            className="text-2xl font-bold"
+            style={{ fontFamily: "var(--font-fraunces)", color: "var(--desk-ink)" }}
+          >
+            Welcome back
+          </h1>
+          <p className="mt-1 text-sm" style={{ color: "var(--desk-muted)" }}>
+            Let&apos;s plan something great today.
           </p>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-700">
-                {error}
-              </div>
-            )}
-            <div>
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="teacher@school.edu"
-                required
-                className="mt-1"
-              />
+        </div>
+
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {error && (
+            <div
+              className="rounded-lg border px-4 py-3 text-sm"
+              style={{
+                background: "#fef2f2",
+                borderColor: "#fca5a5",
+                color: "#b91c1c",
+              }}
+            >
+              <strong>Heads up: </strong>{error}
             </div>
-            <div>
-              <Label htmlFor="password">Password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                required
-                className="mt-1"
-              />
-            </div>
-            <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? "Signing in..." : "Sign In"}
-            </Button>
-          </form>
-          <p className="mt-4 text-center text-sm text-gray-500">
-            Don&apos;t have an account?{" "}
-            <Link href="/register" className="text-blue-600 hover:underline">
-              Register
-            </Link>
-          </p>
-        </CardContent>
-      </Card>
+          )}
+
+          <div className="space-y-1.5">
+            <Label
+              htmlFor="email"
+              className="text-sm font-semibold"
+              style={{ color: "var(--desk-ink)" }}
+            >
+              Email address
+            </Label>
+            <Input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="teacher@school.edu"
+              required
+              className="border-[var(--desk-border)] bg-[var(--desk-bg)] focus:border-[var(--desk-teal)] focus:ring-[var(--desk-teal)]"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label
+              htmlFor="password"
+              className="text-sm font-semibold"
+              style={{ color: "var(--desk-ink)" }}
+            >
+              Password
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              required
+              className="border-[var(--desk-border)] bg-[var(--desk-bg)] focus:border-[var(--desk-teal)]"
+            />
+          </div>
+
+          <Button
+            type="submit"
+            className="w-full bg-[var(--desk-teal)] text-white hover:opacity-90 py-5 text-base"
+            disabled={loading}
+          >
+            {loading ? "Signing in…" : "Sign in →"}
+          </Button>
+        </form>
+
+        <p className="mt-6 text-center text-sm" style={{ color: "var(--desk-muted)" }}>
+          New here?{" "}
+          <Link
+            href="/register"
+            className="font-semibold underline-offset-2 hover:underline"
+            style={{ color: "var(--desk-teal)" }}
+          >
+            Create an account
+          </Link>
+        </p>
+      </PaperPage>
     </div>
   );
 }
+

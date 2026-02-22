@@ -15,6 +15,7 @@ interface WizardState {
   learningObjectives: string;
   // Step 3 results
   generatedActivities: Activity[];
+  generationRequestId: string | null;
   isGenerating: boolean;
   // Actions
   setGradeLevel: (g: GradeLevel) => void;
@@ -23,6 +24,7 @@ interface WizardState {
   setLessonInfo: (info: string) => void;
   setLearningObjectives: (obj: string) => void;
   setGeneratedActivities: (activities: Activity[]) => void;
+  setGenerationRequestId: (id: string | null) => void;
   setIsGenerating: (generating: boolean) => void;
   reset: () => void;
 }
@@ -34,6 +36,7 @@ const initialState = {
   lessonInfo: "",
   learningObjectives: "",
   generatedActivities: [] as Activity[],
+  generationRequestId: null as string | null,
   isGenerating: false,
 };
 
@@ -47,11 +50,12 @@ export const useWizardStore = create<WizardState>()(
       setLessonInfo: (lessonInfo) => set({ lessonInfo }),
       setLearningObjectives: (learningObjectives) => set({ learningObjectives }),
       setGeneratedActivities: (generatedActivities) => set({ generatedActivities }),
+      setGenerationRequestId: (generationRequestId) => set({ generationRequestId }),
       setIsGenerating: (isGenerating) => set({ isGenerating }),
       reset: () => set(initialState),
     }),
     {
-      name: "acti-genie-wizard",
+      name: "planboard-wizard",
       storage: createJSONStorage(() => sessionStorage),
       partialize: (state) => ({
         gradeLevel: state.gradeLevel,
@@ -59,6 +63,8 @@ export const useWizardStore = create<WizardState>()(
         activityType: state.activityType,
         lessonInfo: state.lessonInfo,
         learningObjectives: state.learningObjectives,
+        generatedActivities: state.generatedActivities,
+        generationRequestId: state.generationRequestId,
       }),
     }
   )
