@@ -44,11 +44,11 @@ export const useWizardStore = create<WizardState>()(
   persist(
     (set) => ({
       ...initialState,
-      setGradeLevel: (gradeLevel) => set({ gradeLevel }),
-      setSubject: (subject) => set({ subject }),
-      setActivityType: (activityType) => set({ activityType }),
-      setLessonInfo: (lessonInfo) => set({ lessonInfo }),
-      setLearningObjectives: (learningObjectives) => set({ learningObjectives }),
+      setGradeLevel: (gradeLevel) => set({ gradeLevel, generatedActivities: [], generationRequestId: null }),
+      setSubject: (subject) => set({ subject, generatedActivities: [], generationRequestId: null }),
+      setActivityType: (activityType) => set({ activityType, generatedActivities: [], generationRequestId: null }),
+      setLessonInfo: (lessonInfo) => set({ lessonInfo, generatedActivities: [], generationRequestId: null }),
+      setLearningObjectives: (learningObjectives) => set({ learningObjectives, generatedActivities: [], generationRequestId: null }),
       setGeneratedActivities: (generatedActivities) => set({ generatedActivities }),
       setGenerationRequestId: (generationRequestId) => set({ generationRequestId }),
       setIsGenerating: (isGenerating) => set({ isGenerating }),

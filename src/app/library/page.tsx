@@ -5,26 +5,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { GRADE_LEVELS, SUBJECTS } from "@/lib/constants";
 import { StampBadge, DeskEmptyState } from "@/components/ui-desk";
-import { BinderSearch } from "@/components/library/binder-search";
+import { BinderFilters } from "@/components/library/binder-filters";
 import { DeleteActivityButton } from "@/components/activity/delete-activity-button";
 import { CreateFolderButton } from "@/components/library/create-folder-button";
 import { AddToFolderButton } from "@/components/library/add-to-folder-button";
 import { FoldersPanel } from "@/components/library/folders-panel";
-
-const categoryIcons: Record<string, string> = {
-  debate: "debate",
-  documentary: "documentary",
-  acting: "acting",
-  conference: "conference",
-  experiment: "experiment",
-  project: "project",
-  presentation: "presentation",
-  research: "research",
-  game: "game",
-  simulation: "simulation",
-  workshop: "workshop",
-  field_trip: "field_trip",
-};
 
 function getGradeLabel(value: string) {
   return GRADE_LEVELS.find((g) => g.value === value)?.label || value;
@@ -154,6 +139,21 @@ function ActivityGrid({
   );
 }
 
+function sortActivities(activities: ActivityRow[], sort: string): ActivityRow[] {
+  const sorted = [...activities];
+  switch (sort) {
+    case "oldest":
+      return sorted.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    case "a-z":
+      return sorted.sort((a, b) => a.title.localeCompare(b.title));
+    case "z-a":
+      return sorted.sort((a, b) => b.title.localeCompare(a.title));
+    case "newest":
+    default:
+      return sorted.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+  }
+}
+
 export default async function LibraryPage({
   searchParams,
 }: {
@@ -161,6 +161,11 @@ export default async function LibraryPage({
 }) {
   const params = await searchParams;
   const searchQuery = (params.q || "").trim().toLowerCase();
+  const gradeFilter = params.grade || "";
+  const subjectFilter = params.subject || "";
+  const typeFilter = params.type || "";
+  const categoryFilter = params.category || "";
+  const sortOption = params.sort || "newest";
 
   const supabase = await createClient();
   const {
@@ -217,29 +222,35 @@ export default async function LibraryPage({
   for (const a of savedActivities) allActivityMap.set(a.id, a);
   const allActivities = Array.from(allActivityMap.values());
 
-  // Apply text search
+  // Apply filters
   function filterActivities(list: ActivityRow[]) {
-    if (!searchQuery) return list;
-    return list.filter(
-      (a) =>
+    return list.filter((a) => {
+      if (searchQuery && !(
         a.title.toLowerCase().includes(searchQuery) ||
         a.summary?.toLowerCase().includes(searchQuery) ||
         a.category.toLowerCase().includes(searchQuery)
-    );
+      )) return false;
+      if (gradeFilter && a.grade_level !== gradeFilter) return false;
+      if (subjectFilter && a.subject !== subjectFilter) return false;
+      if (typeFilter && a.activity_type !== typeFilter) return false;
+      if (categoryFilter && a.category !== categoryFilter) return false;
+      return true;
+    });
   }
 
-  const filteredMine = filterActivities(myActivities ?? []);
-  const filteredSaved = filterActivities(savedActivities);
-
+  const filteredMine = sortActivities(filterActivities(myActivities ?? []), sortOption);
+  const filteredSaved = sortActivities(filterActivities(savedActivities), sortOption);
 
   const myCount = myActivities?.length ?? 0;
   const savedCount = savedActivities.length;
   const folderCount = folders.length;
 
+  const hasActiveFilters = gradeFilter || subjectFilter || typeFilter || categoryFilter || searchQuery;
+
   return (
     <div className="container mx-auto max-w-4xl px-4 py-8">
       {/* Header */}
-      <div className="mb-8 flex items-start justify-between gap-4">
+      <div className="mb-6 flex items-start justify-between gap-4">
         <div>
           <h1 className="font-display text-4xl font-bold text-desk-ink leading-tight">
             My{" "}
@@ -250,7 +261,6 @@ export default async function LibraryPage({
           </p>
         </div>
         <div className="flex items-center gap-3 shrink-0">
-          <BinderSearch />
           <CreateFolderButton />
           <Link href="/wizard/step-1">
             <Button className="bg-desk-teal text-white hover:opacity-90">
@@ -258,6 +268,11 @@ export default async function LibraryPage({
             </Button>
           </Link>
         </div>
+      </div>
+
+      {/* Filters */}
+      <div className="mb-6">
+        <BinderFilters />
       </div>
 
       {/* Tabs */}
@@ -307,7 +322,11 @@ export default async function LibraryPage({
             />
           ) : filteredMine.length === 0 ? (
             <div className="py-16 text-center">
-              <p className="text-lg" style={{ color: "var(--desk-muted)" }}>No activities match &ldquo;{params.q}&rdquo;.</p>
+              <p className="text-lg" style={{ color: "var(--desk-muted)" }}>
+                {hasActiveFilters
+                  ? "No activities match your filters."
+                  : `No activities match \u201c${params.q}\u201d.`}
+              </p>
             </div>
           ) : (
             <ActivityGrid
@@ -332,7 +351,11 @@ export default async function LibraryPage({
             />
           ) : filteredSaved.length === 0 ? (
             <div className="py-16 text-center">
-              <p className="text-lg" style={{ color: "var(--desk-muted)" }}>No saved activities match &ldquo;{params.q}&rdquo;.</p>
+              <p className="text-lg" style={{ color: "var(--desk-muted)" }}>
+                {hasActiveFilters
+                  ? "No saved activities match your filters."
+                  : `No saved activities match \u201c${params.q}\u201d.`}
+              </p>
             </div>
           ) : (
             <ActivityGrid
