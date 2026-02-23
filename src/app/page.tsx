@@ -53,7 +53,7 @@ export default function Home() {
 
               <p className="animate-fade-in-up animate-delay-3 text-xl md:text-2xl font-semibold mb-3"
                 style={{ color: "var(--desk-ink)", fontFamily: "var(--font-fraunces)" }}>
-                Turn lesson goals into classroom-ready activities<span className="type-cursor" />
+                Turn lesson goals into ready-to-teach activities<span className="type-cursor" />
               </p>
               <p className="animate-fade-in-up animate-delay-4 text-base md:text-lg max-w-xl mx-auto md:mx-0 mb-10 leading-relaxed"
                 style={{ color: "var(--desk-muted)" }}>
