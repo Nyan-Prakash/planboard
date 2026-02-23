@@ -43,7 +43,7 @@ export function Header() {
         </Link>
 
         {/* Nav */}
-        <nav className="flex items-center gap-6">
+        <nav className="flex items-center gap-2">
           {/* Primary nav links */}
           <div className="flex items-center gap-1">
             <Link href="/marketplace">

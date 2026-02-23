@@ -643,3 +643,87 @@ button:disabled {
   animation: ribbon-shine 4s ease-in-out infinite;
   animation-delay: 1s;
 }
+
+/* ============================================================
+   HERO 3D MOCKUP — floating bob on the entire 3D frame
+   ============================================================ */
+@keyframes mockup-float {
+  0%, 100% { transform: perspective(1200px) rotateX(6deg) rotateY(-12deg) translateY(0px); }
+  50%       { transform: perspective(1200px) rotateX(6deg) rotateY(-12deg) translateY(-10px); }
+}
+.mockup-3d-float {
+  animation: mockup-float 6s ease-in-out infinite;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* ============================================================
+   HERO 3D MOCKUP — activity card staggered entrance
+   ============================================================ */
+@keyframes mockup-card-reveal {
+  0%   { opacity: 0; transform: translateY(20px) scale(0.94); }
+  60%  { opacity: 1; transform: translateY(-2px) scale(1.01); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+.mockup-card-1 { animation: mockup-card-reveal 0.55s cubic-bezier(0.16, 1, 0.3, 1) 1.2s both; }
+.mockup-card-2 { animation: mockup-card-reveal 0.55s cubic-bezier(0.16, 1, 0.3, 1) 1.7s both; }
+.mockup-card-3 { animation: mockup-card-reveal 0.55s cubic-bezier(0.16, 1, 0.3, 1) 2.2s both; }
+.mockup-card-4 { animation: mockup-card-reveal 0.55s cubic-bezier(0.16, 1, 0.3, 1) 2.7s both; }
+
+/* ============================================================
+   HERO 3D MOCKUP — URL bar cursor blink
+   ============================================================ */
+@keyframes mockup-url-cursor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.mockup-url-cursor {
+  display: inline-block;
+  width: 1px;
+  height: 0.75em;
+  background: var(--desk-teal);
+  margin-left: 1px;
+  vertical-align: text-bottom;
+  animation: mockup-url-cursor 0.8s step-end 3.5s infinite;
+}
+
+/* ============================================================
+   HERO 3D MOCKUP — category badge stamp entrance
+   ============================================================ */
+@keyframes mockup-badge-stamp {
+  0%   { transform: scale(1.3) rotate(-4deg); opacity: 0; }
+  70%  { transform: scale(0.97) rotate(0.5deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+.mockup-badge {
+  animation: mockup-badge-stamp 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ============================================================
+   HERO 3D MOCKUP — browser title bar shimmer
+   ============================================================ */
+@keyframes mockup-titlebar-shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.mockup-titlebar-shimmer {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--desk-teal) 6%, var(--desk-paper)) 0%,
+    color-mix(in srgb, var(--desk-teal) 12%, var(--desk-paper)) 50%,
+    color-mix(in srgb, var(--desk-teal) 6%, var(--desk-paper)) 100%
+  );
+  background-size: 200% auto;
+  animation: mockup-titlebar-shimmer 4s ease-in-out infinite;
+}
+
+/* ============================================================
+   HERO 3D MOCKUP — generate input focus pulse
+   ============================================================ */
+@keyframes mockup-input-pulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(42, 157, 143, 0); }
+  50% { box-shadow: 0 0 0 3px rgba(42, 157, 143, 0.25); }
+}
+.mockup-input-pulse {
+  animation: mockup-input-pulse 2.5s ease-in-out 0.8s infinite;
+}

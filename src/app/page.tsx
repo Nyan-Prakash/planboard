@@ -10,6 +10,7 @@ import {
   AnimatedCounter,
 } from "@/components/ui-desk";
 import { WaitlistForm } from "@/components/landing/waitlist-form";
+import { HeroMockup } from "@/components/landing/hero-mockup";
 
 export default function Home() {
   return (
@@ -29,82 +30,76 @@ export default function Home() {
           <div className="float-slow absolute bottom-32 left-[60%] w-2 h-2 rounded-full" style={{ background: "var(--desk-sage)", opacity: 0.18 }} />
         </div>
 
-        <div className="container mx-auto max-w-5xl px-4 text-center relative">
-          {/* Overline stamp */}
-          <div className="animate-fade-in-up mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
-            style={{ borderColor: "var(--desk-border)", background: "var(--desk-paper)" }}>
-            <span className="inline-block h-2 w-2 rounded-full glow-dot" style={{ background: "var(--desk-teal)" }} />
-            <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--desk-muted)" }}>
-              AI-powered lesson planning
-            </span>
-          </div>
+        <div className="container mx-auto max-w-6xl px-4 relative">
+          <div className="flex flex-col md:flex-row md:items-center gap-12 lg:gap-16">
 
-          {/* Logo mark with sparkles */}
-          <div className="animate-fade-in-up animate-delay-1 flex items-center justify-center mb-5">
-            <div className="relative">
-              <div
-                className="flex h-16 w-16 items-center justify-center rounded-2xl text-white text-3xl shadow-lg select-none"
-                style={{ background: "linear-gradient(135deg, var(--desk-teal), #1f7a6f)" }}
-              >
-                ✦
+            {/* ── LEFT: text content ── */}
+            <div className="flex-1 text-center md:text-left">
+
+              {/* Overline stamp */}
+              <div className="animate-fade-in-up mb-4 inline-flex items-center gap-2 rounded-full border px-4 py-1.5"
+                style={{ borderColor: "var(--desk-border)", background: "var(--desk-paper)" }}>
+                <span className="inline-block h-2 w-2 rounded-full glow-dot" style={{ background: "var(--desk-teal)" }} />
+                <span className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--desk-muted)" }}>
+                  AI-powered lesson planning
+                </span>
               </div>
-              {/* Sparkle particles around logo */}
-              <svg className="sparkle absolute -top-2 -right-2 w-4 h-4" viewBox="0 0 16 16" fill="var(--desk-accent)" aria-hidden>
-                <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
-              </svg>
-              <svg className="sparkle absolute -bottom-1 -left-3 w-3 h-3" viewBox="0 0 16 16" fill="var(--desk-teal)" aria-hidden>
-                <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
-              </svg>
-              <svg className="sparkle absolute top-1 -left-4 w-2.5 h-2.5" viewBox="0 0 16 16" fill="var(--desk-rose)" aria-hidden>
-                <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" />
-              </svg>
+
+              {/* Logo mark with sparkles */}
+
+              <HighlighterHeading as="h1" className="animate-fade-in-up animate-delay-2 text-5xl md:text-6xl lg:text-7xl mb-4">
+                Planboard
+              </HighlighterHeading>
+
+              <p className="animate-fade-in-up animate-delay-3 text-xl md:text-2xl font-semibold mb-3"
+                style={{ color: "var(--desk-ink)", fontFamily: "var(--font-fraunces)" }}>
+                Turn lesson goals into classroom-ready activities<span className="type-cursor" />
+              </p>
+              <p className="animate-fade-in-up animate-delay-4 text-base md:text-lg max-w-xl mx-auto md:mx-0 mb-10 leading-relaxed"
+                style={{ color: "var(--desk-muted)" }}>
+                Describe your lesson, and our ML-driven engine generates four structured,
+                standards-aligned activity plans in seconds — refined by real teacher feedback
+                through our custom feedback loop.
+              </p>
+
+              <div className="animate-fade-in-up animate-delay-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center md:justify-start">
+                <Link href="/wizard/step-1">
+                  <Button
+                    size="lg"
+                    className="shimmer-btn pulse-ring px-10 py-6 bg-desk-teal text-white hover:opacity-90 shadow-md gap-2 text-lg"
+                  >
+                    Generate activities
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="ml-1">
+                      <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  </Button>
+                </Link>
+                <Link href="/marketplace">
+                  <Button
+                    variant="outline"
+                    size="lg"
+                    className="px-10 py-6 border-desk-border text-desk-ink hover:bg-desk-bg text-lg"
+                  >
+                    Explore marketplace
+                  </Button>
+                </Link>
+              </div>
+
+              {/* Meta stamps */}
+              <div className="animate-fade-in-up animate-delay-5 mt-10 flex flex-wrap items-center justify-center md:justify-start gap-3">
+                <StampBadge color="teal">4 activities per run</StampBadge>
+                <StampBadge color="sage">K-12 aligned</StampBadge>
+                <StampBadge color="rose">10–20 sec generation</StampBadge>
+                <StampBadge color="accent">Design thinking framework</StampBadge>
+              </div>
+
+            </div>{/* end left column */}
+
+            {/* ── RIGHT: 3D mockup ── */}
+            <div className="hidden md:flex flex-1 md:flex-[1.1] items-center justify-center">
+              <HeroMockup />
             </div>
-          </div>
 
-          <HighlighterHeading as="h1" className="animate-fade-in-up animate-delay-2 text-5xl md:text-6xl lg:text-7xl mb-4">
-            Planboard
-          </HighlighterHeading>
-
-          <p className="animate-fade-in-up animate-delay-3 text-xl md:text-2xl font-semibold mb-3"
-            style={{ color: "var(--desk-ink)", fontFamily: "var(--font-fraunces)" }}>
-            Turn lesson goals into classroom-ready activities<span className="type-cursor" />
-          </p>
-          <p className="animate-fade-in-up animate-delay-4 text-base md:text-lg max-w-2xl mx-auto mb-10 leading-relaxed"
-            style={{ color: "var(--desk-muted)" }}>
-            Describe your lesson, and our ML-driven engine generates four structured,
-            standards-aligned activity plans in seconds — refined by real teacher feedback
-            through our custom feedback loop.
-          </p>
-
-          <div className="animate-fade-in-up animate-delay-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link href="/wizard/step-1">
-              <Button
-                size="lg"
-                className="shimmer-btn pulse-ring px-10 py-6 bg-desk-teal text-white hover:opacity-90 shadow-md gap-2 text-lg"
-              >
-                Generate activities
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="ml-1">
-                  <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              </Button>
-            </Link>
-            <Link href="/marketplace">
-              <Button
-                variant="outline"
-                size="lg"
-                className="px-10 py-6 border-desk-border text-desk-ink hover:bg-desk-bg text-lg"
-              >
-                Explore marketplace
-              </Button>
-            </Link>
-          </div>
-
-          {/* Meta stamps */}
-          <div className="animate-fade-in-up animate-delay-5 mt-10 flex flex-wrap items-center justify-center gap-3">
-            <StampBadge color="teal">4 activities per run</StampBadge>
-            <StampBadge color="sage">K-12 aligned</StampBadge>
-            <StampBadge color="rose">10–20 sec generation</StampBadge>
-            <StampBadge color="accent">Design thinking framework</StampBadge>
           </div>
         </div>
       </section>
