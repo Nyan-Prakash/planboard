@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -9,13 +8,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PaperPage } from "@/components/ui-desk";
 
+type RegisterState = "form" | "check-email";
+
 export default function RegisterPage() {
-  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [registerState, setRegisterState] = useState<RegisterState>("form");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,7 +24,10 @@ export default function RegisterPage() {
     setError("");
 
     const supabase = createClient();
-    const { error: authError } = await supabase.auth.signUp({
+    const {
+      data: signUpData,
+      error: authError,
+    } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -37,7 +41,15 @@ export default function RegisterPage() {
       return;
     }
 
-    router.push("/login");
+    setLoading(false);
+
+    // If email confirmation is required, Supabase returns no session.
+    if (!signUpData.session) {
+      setRegisterState("check-email");
+      return;
+    }
+
+    window.location.href = "/wizard/step-1";
   };
 
   return (
@@ -68,80 +80,116 @@ export default function RegisterPage() {
             className="text-2xl font-bold"
             style={{ fontFamily: "var(--font-fraunces)", color: "var(--desk-ink)" }}
           >
-            Create your account
+            {registerState === "check-email" ? "Check your email" : "Create your account"}
           </h1>
           <p className="mt-1 text-sm" style={{ color: "var(--desk-muted)" }}>
-            Join educators saving planning time with Planboard.
+            {registerState === "check-email"
+              ? "We sent a confirmation link so you can finish creating your Planboard account."
+              : "Join educators saving planning time with Planboard."}
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {error && (
+        {registerState === "check-email" ? (
+          <div className="space-y-4">
             <div
               className="rounded-lg border px-4 py-3 text-sm"
-              style={{ background: "#fef2f2", borderColor: "#fca5a5", color: "#b91c1c" }}
+              style={{ background: "#ecfeff", borderColor: "#67e8f9", color: "#0f766e" }}
             >
-              <strong>Heads up: </strong>{error}
+              <strong>Next step:</strong> open the confirmation email sent to <strong>{email}</strong>, then click the link to activate your account.
             </div>
-          )}
 
-          <div className="space-y-1.5">
-            <Label htmlFor="name" className="text-sm font-semibold" style={{ color: "var(--desk-ink)" }}>
-              Your name
-            </Label>
-            <Input
-              id="name"
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ms. Johnson"
-              required
-              className="border-[var(--desk-border)] bg-[var(--desk-bg)]"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="email" className="text-sm font-semibold" style={{ color: "var(--desk-ink)" }}>
-              Email address
-            </Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="teacher@school.edu"
-              required
-              className="border-[var(--desk-border)] bg-[var(--desk-bg)]"
-            />
-          </div>
-
-          <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-sm font-semibold" style={{ color: "var(--desk-ink)" }}>
-              Password
-            </Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              required
-              minLength={6}
-              className="border-[var(--desk-border)] bg-[var(--desk-bg)]"
-            />
-            <p className="text-xs" style={{ color: "var(--desk-muted)" }}>
-              Must be at least 6 characters
+            <p className="text-sm" style={{ color: "var(--desk-muted)" }}>
+              After confirming, return here and sign in.
             </p>
-          </div>
 
-          <Button
-            type="submit"
-            className="w-full bg-[var(--desk-teal)] text-white hover:opacity-90 py-5 text-base"
-            disabled={loading}
-          >
-            {loading ? "Creating account…" : "Create account"}
-          </Button>
-        </form>
+            <Button
+              asChild
+              className="w-full bg-[var(--desk-teal)] text-white hover:opacity-90 py-5 text-base"
+            >
+              <Link href="/login">Continue to sign in</Link>
+            </Button>
+
+            <Button
+              type="button"
+              variant="outline"
+              className="w-full"
+              onClick={() => {
+                setRegisterState("form");
+                setError("");
+              }}
+            >
+              Use a different email
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div
+                className="rounded-lg border px-4 py-3 text-sm"
+                style={{ background: "#fef2f2", borderColor: "#fca5a5", color: "#b91c1c" }}
+              >
+                <strong>Heads up: </strong>{error}
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <Label htmlFor="name" className="text-sm font-semibold" style={{ color: "var(--desk-ink)" }}>
+                Your name
+              </Label>
+              <Input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Ms. Johnson"
+                required
+                className="border-[var(--desk-border)] bg-[var(--desk-bg)]"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-sm font-semibold" style={{ color: "var(--desk-ink)" }}>
+                Email address
+              </Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="teacher@school.edu"
+                required
+                className="border-[var(--desk-border)] bg-[var(--desk-bg)]"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-sm font-semibold" style={{ color: "var(--desk-ink)" }}>
+                Password
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="••••••••"
+                required
+                minLength={6}
+                className="border-[var(--desk-border)] bg-[var(--desk-bg)]"
+              />
+              <p className="text-xs" style={{ color: "var(--desk-muted)" }}>
+                Must be at least 6 characters
+              </p>
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full bg-[var(--desk-teal)] text-white hover:opacity-90 py-5 text-base"
+              disabled={loading}
+            >
+              {loading ? "Creating account…" : "Create account"}
+            </Button>
+          </form>
+        )}
 
         <p className="mt-6 text-center text-sm" style={{ color: "var(--desk-muted)" }}>
           Already have an account?{" "}

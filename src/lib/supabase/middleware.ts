@@ -32,8 +32,15 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Routes that require authentication
-  const protectedPaths = ["/wizard", "/library", "/rate", "/profile", "/onboarding"];
+  // /org/join is intentionally excluded: it shows a "log in to accept" prompt itself
+  const protectedPaths = ["/wizard", "/library", "/rate", "/profile", "/onboarding", "/org/create", "/org/admin"];
   const isProtected = protectedPaths.some((p) => pathname.startsWith(p));
+
+  // /api/orgs routes also require auth (handled in each route handler, but middleware adds a fast path)
+  // /api/org-invites/lookup is intentionally public (token-gated)
+  const isProtectedApi =
+    pathname.startsWith("/api/orgs") ||
+    pathname === "/api/org-invites/accept";
 
   // If not authed and on a protected route -> /login
   if (!user && isProtected) {
@@ -42,6 +49,16 @@ export async function updateSession(request: NextRequest) {
     url.searchParams.set("redirectTo", pathname);
     return NextResponse.redirect(url);
   }
+
+  // For protected API routes, return 401 early (belt-and-suspenders; route handlers also check)
+  if (!user && isProtectedApi) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // /org/admin role enforcement is handled in the page server component
+  // (src/app/org/admin/page.tsx calls getMyOrgMembership() via admin client
+  // and redirects non-admins). Doing it here via the anon client is redundant
+  // and unreliable due to RLS on organization_members.
 
   // Redirect logged-in users away from login/register
   const authPaths = ["/login", "/register"];

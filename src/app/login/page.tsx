@@ -17,6 +17,14 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const toFriendlyAuthError = (message: string) => {
+    const normalized = message.toLowerCase();
+    if (normalized.includes("email not confirmed") || normalized.includes("confirm your email")) {
+      return "Please confirm your email before signing in. Check your inbox for the confirmation link.";
+    }
+    return message;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -29,7 +37,7 @@ export default function LoginPage() {
     });
 
     if (authError) {
-      setError(authError.message);
+      setError(toFriendlyAuthError(authError.message));
       setLoading(false);
     } else {
       const redirectTo = searchParams.get("redirectTo") || "/wizard/step-1";
