@@ -81,3 +81,12 @@ export const folderActivities = pgTable("folder_activities", {
 }, (table) => [
   unique("folder_activities_folder_activity_unique").on(table.folderId, table.activityId),
 ]);
+
+export const waitlistSignups = pgTable("waitlist_signups", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  email: text("email").notNull(),
+  source: text("source").default("landing_page").notNull(),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+  unique("waitlist_signups_email_unique").on(table.email),
+]);

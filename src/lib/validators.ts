@@ -25,5 +25,9 @@ export const ratingSchema = z.object({
   comment: z.string().optional(),
 });
 
+export const waitlistSignupSchema = z.object({
+  email: z.string().email("Please enter a valid email address").max(255, "Email is too long"),
+});
+
 export type GenerateInput = z.infer<typeof generateSchema>;
 export type RatingInput = z.infer<typeof ratingSchema>;

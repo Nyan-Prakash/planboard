@@ -9,6 +9,7 @@ import {
   Reveal,
   AnimatedCounter,
 } from "@/components/ui-desk";
+import { WaitlistForm } from "@/components/landing/waitlist-form";
 
 export default function Home() {
   return (
@@ -132,9 +133,17 @@ export default function Home() {
       </section>
 
       {/* ── How it works ──────────────────────────────────────── */}
-      <section className="container mx-auto max-w-5xl px-4 py-20 md:py-28">
+      <section className="relative container mx-auto max-w-5xl px-4 py-20 md:py-28">
+        {/* Background floating decorations */}
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="float-slow absolute top-8 right-[5%] w-2.5 h-2.5 rounded-full" style={{ background: "var(--desk-teal)", opacity: 0.15 }} />
+          <div className="float-medium absolute top-24 left-[3%] w-2 h-2 rounded-full" style={{ background: "var(--desk-rose)", opacity: 0.12 }} />
+          <div className="float-fast absolute bottom-16 right-[10%] w-3 h-3 rounded-full" style={{ background: "var(--desk-sage)", opacity: 0.1 }} />
+          <div className="float-slow absolute bottom-32 left-[8%] w-1.5 h-1.5 rounded-full" style={{ background: "var(--desk-accent)", opacity: 0.2 }} />
+        </div>
+
         <Reveal>
-          <div className="text-center mb-12">
+          <div className="text-center mb-14">
             <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "var(--desk-teal)" }}>
               How it works
             </p>
@@ -147,11 +156,21 @@ export default function Home() {
           </div>
         </Reveal>
 
-        {/* Step connector line (desktop only) */}
-        <div className="hidden sm:block relative mb-2">
-          <div className="absolute top-5 left-[16.67%] right-[16.67%] h-0.5" style={{ background: "color-mix(in srgb, var(--desk-border) 60%, transparent)" }}>
-            <div className="line-grow h-full" style={{ background: "var(--desk-teal)", opacity: 0.3 }} />
-          </div>
+        {/* Animated dotted connector line (desktop only) */}
+        <div className="hidden sm:block relative mb-4">
+          <svg className="absolute top-5 left-[16.67%] w-[66.66%] h-6 pointer-events-none" viewBox="0 0 800 24" fill="none" preserveAspectRatio="none" aria-hidden>
+            {/* Background track */}
+            <path d="M0 12h800" stroke="var(--desk-border)" strokeWidth="2" strokeDasharray="6 6" opacity="0.35" />
+            {/* Animated flowing dots */}
+            <path className="dash-animate" d="M0 12h800" stroke="var(--desk-teal)" strokeWidth="2.5" strokeDasharray="4 12" opacity="0.5" style={{ animationDuration: "2s" }} />
+            {/* Step node circles */}
+            <circle cx="0" cy="12" r="6" fill="var(--desk-teal)" opacity="0.9" />
+            <circle cx="0" cy="12" r="3" fill="white" />
+            <circle cx="400" cy="12" r="6" fill="var(--desk-rose)" opacity="0.9" />
+            <circle cx="400" cy="12" r="3" fill="white" />
+            <circle cx="800" cy="12" r="6" fill="var(--desk-sage)" opacity="0.9" />
+            <circle cx="800" cy="12" r="3" fill="white" />
+          </svg>
         </div>
 
         <Reveal variant="stagger">
@@ -191,19 +210,39 @@ export default function Home() {
                   </svg>
                 ),
               },
-            ].map((step) => (
-              <div key={step.num} className="reveal-child magnetic-card">
-                <StickyCard color={step.color} className="flex flex-col gap-4 h-full">
+            ].map((step, i) => (
+              <div key={step.num} className="reveal-child relative">
+                {/* Mobile dotted connector (between cards, not after last) */}
+                {i < 2 && (
+                  <div className="sm:hidden flex justify-center -mb-3 mt-1">
+                    <svg width="4" height="40" viewBox="0 0 4 40" fill="none" aria-hidden>
+                      <path className="dash-animate" d="M2 0v40" stroke={`var(--desk-${step.color})`} strokeWidth="2" strokeDasharray="4 4" opacity="0.4" style={{ animationDuration: "1.5s" }} />
+                    </svg>
+                  </div>
+                )}
+                <StickyCard color={step.color} className="magnetic-card flex flex-col gap-4 h-full relative overflow-hidden">
+                  {/* Decorative corner glow */}
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 rounded-full opacity-[0.06]"
+                    style={{ background: `radial-gradient(circle, var(--desk-${step.color}), transparent 70%)` }}
+                  />
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-10 h-10 rounded-xl flex items-center justify-center text-white text-sm font-bold"
-                      style={{ background: `var(--desk-${step.color})` }}
+                      className="step-number-pop w-12 h-12 rounded-xl flex items-center justify-center text-white text-base font-bold shadow-md relative"
+                      style={{ background: `linear-gradient(135deg, var(--desk-${step.color}), color-mix(in srgb, var(--desk-${step.color}) 70%, #000))` }}
                     >
                       {step.num}
+                      {/* Subtle ring pulse */}
+                      <span className="absolute inset-0 rounded-xl step-ring-pulse" style={{ boxShadow: `0 0 0 0 var(--desk-${step.color})` }} />
                     </div>
                     <div className="icon-bob opacity-40" style={{ color: `var(--desk-${step.color})` }}>
                       {step.icon}
                     </div>
+                    {/* Step label pill */}
+                    <span className="ml-auto text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-full" style={{ background: `color-mix(in srgb, var(--desk-${step.color}) 10%, transparent)`, color: `var(--desk-${step.color})` }}>
+                      Step {step.num}
+                    </span>
                   </div>
                   <h3 className="font-bold text-lg" style={{ fontFamily: "var(--font-fraunces)", color: "var(--desk-ink)" }}>
                     {step.title}
@@ -211,9 +250,41 @@ export default function Home() {
                   <p className="text-sm leading-relaxed" style={{ color: "var(--desk-muted)" }}>
                     {step.body}
                   </p>
+                  {/* Bottom accent bar */}
+                  <div className="mt-auto pt-3 flex items-center gap-2">
+                    <div className="flex-1 h-0.5 rounded-full overflow-hidden" style={{ background: "color-mix(in srgb, var(--desk-border) 40%, transparent)" }}>
+                      <div className="h-full rounded-full storefront-bar" style={{ background: `var(--desk-${step.color})`, opacity: 0.4, width: "100%" }} />
+                    </div>
+                    <svg viewBox="0 0 16 16" fill="none" className="w-3.5 h-3.5 shrink-0" aria-hidden>
+                      <path d="M3 8h10M9 4l4 4-4 4" stroke={`var(--desk-${step.color})`} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" opacity="0.5" />
+                    </svg>
+                  </div>
                 </StickyCard>
               </div>
             ))}
+          </div>
+        </Reveal>
+
+        {/* Bottom result teaser */}
+        <Reveal>
+          <div className="mt-10 flex justify-center">
+            <div className="inline-flex items-center gap-3 rounded-full border px-5 py-2.5 shadow-sm magnetic-card"
+              style={{ borderColor: "var(--desk-border)", background: "var(--desk-paper)" }}>
+              <div className="flex -space-x-1">
+                {["var(--desk-teal)", "var(--desk-rose)", "var(--desk-sage)", "var(--desk-accent)"].map((c, i) => (
+                  <div key={i} className="w-5 h-5 rounded-full border-2 border-white flex items-center justify-center"
+                    style={{ background: c, zIndex: 4 - i }}>
+                    <svg viewBox="0 0 24 24" fill="none" className="w-2.5 h-2.5" stroke="white" strokeWidth="2">
+                      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+                    </svg>
+                  </div>
+                ))}
+              </div>
+              <span className="text-xs font-semibold" style={{ color: "var(--desk-muted)" }}>
+                4 unique activities generated every run
+              </span>
+              <span className="glow-dot w-2 h-2 rounded-full" style={{ background: "var(--desk-teal)" }} />
+            </div>
           </div>
         </Reveal>
       </section>
@@ -459,18 +530,51 @@ export default function Home() {
       </section>
 
       {/* ── What's included (Feature bullets) ─────────────────── */}
-      <section className="py-20 md:py-28" style={{ background: "var(--desk-paper)" }}>
-        <div className="container mx-auto max-w-5xl px-4">
+      <section className="relative py-20 md:py-28" style={{ background: "var(--desk-paper)" }}>
+        {/* Background decorative elements */}
+        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="float-medium absolute top-12 left-[6%] w-2 h-2 rounded-full" style={{ background: "var(--desk-sage)", opacity: 0.15 }} />
+          <div className="float-slow absolute top-28 right-[4%] w-3 h-3 rounded-full" style={{ background: "var(--desk-teal)", opacity: 0.1 }} />
+          <div className="float-fast absolute bottom-20 left-[12%] w-2 h-2 rounded-full" style={{ background: "var(--desk-rose)", opacity: 0.12 }} />
+          <div className="float-medium absolute bottom-12 right-[15%] w-2.5 h-2.5 rounded-full" style={{ background: "var(--desk-accent)", opacity: 0.15 }} />
+          {/* Decorative corner SVG patterns */}
+          <svg className="absolute top-0 left-0 w-40 h-40 opacity-[0.04]" viewBox="0 0 160 160" fill="none" aria-hidden>
+            <circle cx="0" cy="0" r="140" stroke="var(--desk-teal)" strokeWidth="1" strokeDasharray="4 8" />
+            <circle cx="0" cy="0" r="100" stroke="var(--desk-sage)" strokeWidth="1" strokeDasharray="4 8" />
+            <circle cx="0" cy="0" r="60" stroke="var(--desk-rose)" strokeWidth="1" strokeDasharray="4 8" />
+          </svg>
+          <svg className="absolute bottom-0 right-0 w-40 h-40 opacity-[0.04]" viewBox="0 0 160 160" fill="none" aria-hidden>
+            <circle cx="160" cy="160" r="140" stroke="var(--desk-sage)" strokeWidth="1" strokeDasharray="4 8" />
+            <circle cx="160" cy="160" r="100" stroke="var(--desk-teal)" strokeWidth="1" strokeDasharray="4 8" />
+            <circle cx="160" cy="160" r="60" stroke="var(--desk-accent)" strokeWidth="1" strokeDasharray="4 8" />
+          </svg>
+        </div>
+
+        <div className="container mx-auto max-w-5xl px-4 relative">
           <Reveal>
-            <div className="text-center mb-12">
+            <div className="text-center mb-14">
               <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "var(--desk-sage)" }}>
                 What&apos;s included
               </p>
               <h2 className="text-3xl md:text-4xl font-bold ribbon-text" style={{ fontFamily: "var(--font-fraunces)" }}>
                 Everything you need to run it tomorrow
               </h2>
+              <p className="mt-3 text-base max-w-lg mx-auto" style={{ color: "var(--desk-muted)" }}>
+                Each generation delivers a complete toolkit — no extra prep required.
+              </p>
             </div>
           </Reveal>
+
+          {/* Animated dotted connector grid lines (desktop) */}
+          <div className="hidden sm:block absolute inset-x-4 pointer-events-none" aria-hidden style={{ top: "55%", height: "1px" }}>
+            <svg className="w-full h-8 -translate-y-1/2" viewBox="0 0 1000 32" fill="none" preserveAspectRatio="none">
+              <path d="M250 16h500" stroke="var(--desk-border)" strokeWidth="1" strokeDasharray="6 8" opacity="0.3" />
+              <path className="dash-animate" d="M250 16h500" stroke="var(--desk-sage)" strokeWidth="1.5" strokeDasharray="3 14" opacity="0.3" style={{ animationDuration: "2.5s" }} />
+              {/* Center crossover dot */}
+              <circle cx="500" cy="16" r="4" fill="var(--desk-sage)" opacity="0.25" />
+              <circle cx="500" cy="16" r="2" fill="var(--desk-paper)" />
+            </svg>
+          </div>
 
           <Reveal variant="stagger">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -479,6 +583,7 @@ export default function Home() {
                   title: "4 activity blueprints",
                   desc: "Complete, structured plans with phases, materials, and timing — every generation.",
                   color: "var(--desk-teal)",
+                  num: "01",
                   icon: (
                     <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" /><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
@@ -489,6 +594,7 @@ export default function Home() {
                   title: "Evaluation criteria & rubrics",
                   desc: "Built-in assessment frameworks with optional rubrics for every activity type.",
                   color: "var(--desk-rose)",
+                  num: "02",
                   icon: (
                     <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M9 11l3 3L22 4" /><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
@@ -499,6 +605,7 @@ export default function Home() {
                   title: "Reflection & differentiation",
                   desc: "Embedded reflection questions and differentiation tips for diverse learners.",
                   color: "var(--desk-sage)",
+                  num: "03",
                   icon: (
                     <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
@@ -509,6 +616,7 @@ export default function Home() {
                   title: "Validated resource links",
                   desc: "Curated external resources — every URL is validated before it reaches you.",
                   color: "var(--desk-accent)",
+                  num: "04",
                   icon: (
                     <svg viewBox="0 0 24 24" fill="none" className="w-6 h-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M10 13a5 5 0 007.54.54l3-3a5 5 0 00-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 00-7.54-.54l-3 3a5 5 0 007.07 7.07l1.71-1.71" />
@@ -517,24 +625,72 @@ export default function Home() {
                 },
               ].map((item) => (
                 <div key={item.title} className="reveal-child">
-                  <PaperPage className="magnetic-card flex items-start gap-4">
+                  <PaperPage className="magnetic-card flex items-start gap-4 relative overflow-hidden group">
+                    {/* Background number watermark */}
+                    <span
+                      aria-hidden
+                      className="absolute -top-2 -right-1 text-6xl font-black pointer-events-none select-none opacity-[0.035]"
+                      style={{ fontFamily: "var(--font-fraunces)", color: item.color }}
+                    >
+                      {item.num}
+                    </span>
+                    {/* Corner glow */}
                     <div
-                      className="icon-bob w-11 h-11 rounded-xl flex items-center justify-center shrink-0"
+                      aria-hidden
+                      className="pointer-events-none absolute -bottom-10 -left-10 w-28 h-28 rounded-full opacity-[0.05] transition-opacity duration-500 group-hover:opacity-[0.1]"
+                      style={{ background: `radial-gradient(circle, ${item.color}, transparent 70%)` }}
+                    />
+                    <div
+                      className="icon-bob w-12 h-12 rounded-xl flex items-center justify-center shrink-0 relative"
                       style={{ background: `color-mix(in srgb, ${item.color} 12%, transparent)`, color: item.color }}
                     >
                       {item.icon}
+                      {/* Decorative dots around icon */}
+                      <svg className="absolute -top-1 -right-1 w-2.5 h-2.5 opacity-40" viewBox="0 0 10 10" fill={item.color} aria-hidden>
+                        <circle cx="5" cy="5" r="2" />
+                      </svg>
                     </div>
-                    <div>
-                      <h3 className="font-bold text-base mb-1" style={{ fontFamily: "var(--font-fraunces)", color: "var(--desk-ink)" }}>
-                        {item.title}
-                      </h3>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <h3 className="font-bold text-base" style={{ fontFamily: "var(--font-fraunces)", color: "var(--desk-ink)" }}>
+                          {item.title}
+                        </h3>
+                      </div>
                       <p className="text-sm leading-relaxed" style={{ color: "var(--desk-muted)" }}>
                         {item.desc}
                       </p>
+                      {/* Animated bottom accent line */}
+                      <div className="mt-3 flex items-center gap-2">
+                        <div className="flex-1 h-px overflow-hidden" style={{ background: "color-mix(in srgb, var(--desk-border) 40%, transparent)" }}>
+                          <div className="h-full included-line-sweep" style={{ background: item.color, opacity: 0.35 }} />
+                        </div>
+                        <svg viewBox="0 0 16 16" fill="none" className="w-3 h-3 shrink-0 opacity-30 group-hover:opacity-60 transition-opacity" aria-hidden>
+                          <path d="M8 0l2 6 6 2-6 2-2 6-2-6-6-2 6-2z" fill={item.color} />
+                        </svg>
+                      </div>
                     </div>
                   </PaperPage>
                 </div>
               ))}
+            </div>
+          </Reveal>
+
+          {/* Bottom connector from features to CTA feel */}
+          <Reveal>
+            <div className="mt-10 flex flex-col items-center gap-2">
+              <svg width="2" height="32" viewBox="0 0 2 32" fill="none" aria-hidden>
+                <path className="dash-animate" d="M1 0v32" stroke="var(--desk-sage)" strokeWidth="2" strokeDasharray="3 5" opacity="0.3" style={{ animationDuration: "1.5s" }} />
+              </svg>
+              <div className="inline-flex items-center gap-2 rounded-full border px-4 py-2 shadow-sm"
+                style={{ borderColor: "var(--desk-border)", background: "var(--desk-paper)" }}>
+                <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4" stroke="var(--desk-sage)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M9 11l3 3L22 4" />
+                  <path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11" />
+                </svg>
+                <span className="text-xs font-semibold" style={{ color: "var(--desk-muted)" }}>
+                  All included in every generation
+                </span>
+              </div>
             </div>
           </Reveal>
         </div>
@@ -742,6 +898,90 @@ export default function Home() {
           </div>
         </Reveal>
       </section>
+
+      {/* ── Waitlist ───────────────────────────────────────────── */}
+      <section className="container mx-auto max-w-5xl px-4 py-14 md:py-20">
+        <Reveal variant="scale">
+          <PaperPage className="relative overflow-hidden px-6 py-7 md:px-8 md:py-9">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute -top-20 -right-16 h-52 w-52 rounded-full opacity-10"
+              style={{ background: "radial-gradient(circle, var(--desk-teal), transparent 70%)" }}
+            />
+            <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <div className="space-y-2">
+                <StampBadge color="accent" animateIn>Early Access</StampBadge>
+                <h3
+                  className="text-2xl md:text-3xl font-bold"
+                  style={{ fontFamily: "var(--font-fraunces)", color: "var(--desk-ink)" }}
+                >
+                  Join the waitlist
+                </h3>
+                <p className="text-sm md:text-base max-w-xl" style={{ color: "var(--desk-muted)" }}>
+                  Be first to try upcoming marketplace features, smarter recommendations,
+                  and collaborative planning tools.
+                </p>
+              </div>
+              <WaitlistForm />
+            </div>
+          </PaperPage>
+        </Reveal>
+      </section>
+
+      {/* ── Footer ─────────────────────────────────────────────── */}
+      <footer className="border-t" style={{ borderColor: "var(--desk-border)", background: "var(--desk-paper)" }}>
+        <div className="container mx-auto max-w-5xl px-4 py-12 md:py-14">
+          <div className="flex flex-col gap-10 md:flex-row md:items-start md:justify-between">
+            <div className="max-w-sm">
+              <div className="mb-3 inline-flex items-center gap-3">
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl text-white text-xl shadow-md select-none"
+                  style={{ background: "linear-gradient(135deg, var(--desk-teal), #1f7a6f)" }}
+                >
+                  ✦
+                </div>
+                <div>
+                  <p className="text-lg font-bold" style={{ fontFamily: "var(--font-fraunces)", color: "var(--desk-ink)" }}>
+                    Planboard
+                  </p>
+                  <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: "var(--desk-muted)" }}>
+                    AI Activity Planner
+                  </p>
+                </div>
+              </div>
+              <p className="text-sm leading-relaxed" style={{ color: "var(--desk-muted)" }}>
+                Create classroom-ready activities in seconds, then refine with community feedback.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 gap-x-10 gap-y-2 text-sm">
+              <Link href="/wizard/step-1" className="font-semibold hover:underline underline-offset-4" style={{ color: "var(--desk-ink)" }}>
+                Generate
+              </Link>
+              <Link href="/marketplace" className="font-semibold hover:underline underline-offset-4" style={{ color: "var(--desk-ink)" }}>
+                Marketplace
+              </Link>
+              <Link href="/library" className="font-semibold hover:underline underline-offset-4" style={{ color: "var(--desk-ink)" }}>
+                Library
+              </Link>
+              <Link href="/login" className="font-semibold hover:underline underline-offset-4" style={{ color: "var(--desk-ink)" }}>
+                Sign in
+              </Link>
+            </div>
+          </div>
+
+          <div
+            className="mt-8 flex flex-col gap-2 border-t pt-5 text-xs md:flex-row md:items-center md:justify-between"
+            style={{ borderColor: "var(--desk-border)", color: "var(--desk-muted)" }}
+          >
+            <p>© {new Date().getFullYear()} Planboard. Built for educators.</p>
+            <div className="flex items-center gap-4">
+              <Link href="/register" className="hover:underline underline-offset-4">Create account</Link>
+              <Link href="/profile" className="hover:underline underline-offset-4">Profile</Link>
+            </div>
+          </div>
+        </div>
+      </footer>
 
     </div>
   );
