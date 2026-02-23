@@ -5,3 +5,5 @@ export { StampBadge } from "./stamp-badge";
 export { HighlighterHeading } from "./highlighter-heading";
 export { DeskEmptyState } from "./desk-empty-state";
 export { ConjureLoader } from "./conjure-loader";
+export { Reveal } from "./reveal";
+export { AnimatedCounter } from "./animated-counter";
