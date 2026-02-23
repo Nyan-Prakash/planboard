@@ -581,16 +581,120 @@ export default function Home() {
                   </Button>
                 </Link>
               </div>
-              <Reveal variant="stagger" className="flex flex-wrap gap-2 justify-center md:justify-end">
-                {["Discussion", "Hands-on", "Project-based", "Game / Quiz", "Debate", "Case study", "Lab / Experiment", "Peer review"].map((tag) => (
-                  <span
-                    key={tag}
-                    className="reveal-child magnetic-card inline-block rounded-lg px-3 py-1.5 text-xs font-semibold cursor-default"
-                    style={{ background: "color-mix(in srgb, var(--desk-teal) 8%, transparent)", color: "var(--desk-teal)", border: "1px solid color-mix(in srgb, var(--desk-teal) 15%, transparent)" }}
-                  >
-                    {tag}
-                  </span>
-                ))}
+              <Reveal variant="scale" className="flex items-center justify-center md:justify-end">
+                <div
+                  className="marketplace-storefront relative w-full max-w-100 rounded-2xl border overflow-hidden"
+                  style={{ borderColor: "var(--desk-border)", background: "var(--desk-paper)", boxShadow: "0 8px 32px rgba(44,36,22,0.08), 0 2px 8px rgba(44,36,22,0.04)" }}
+                >
+                  {/* Storefront header */}
+                  <div className="flex items-center gap-2 px-4 py-3 border-b" style={{ borderColor: "var(--desk-border)", background: "color-mix(in srgb, var(--desk-teal) 6%, var(--desk-paper))" }}>
+                    <div className="flex gap-1.5">
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--desk-rose)", opacity: 0.7 }} />
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--desk-accent)", opacity: 0.7 }} />
+                      <div className="w-2.5 h-2.5 rounded-full" style={{ background: "var(--desk-sage)", opacity: 0.7 }} />
+                    </div>
+                    {/* Search bar */}
+                    <div className="flex-1 flex items-center gap-1.5 rounded-md px-2.5 py-1 ml-2" style={{ background: "var(--desk-paper)", border: "1px solid var(--desk-border)" }}>
+                      <svg viewBox="0 0 24 24" fill="none" className="w-3 h-3 shrink-0" stroke="var(--desk-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                        <circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" />
+                      </svg>
+                      <span className="text-[9px] font-medium" style={{ color: "var(--desk-muted)" }}>Search activities…</span>
+                    </div>
+                    <div className="w-5 h-5 rounded-full flex items-center justify-center" style={{ background: "var(--desk-teal)" }}>
+                      <svg viewBox="0 0 24 24" fill="none" className="w-3 h-3" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Mini activity cards grid */}
+                  <div className="p-3 grid grid-cols-2 gap-2.5">
+                    {[
+                      { title: "Ecosystem Web", subject: "Science", grade: "Grade 5", color: "var(--desk-teal)", rating: 4.8, saves: 124, initials: "SC" },
+                      { title: "Fraction Quest", subject: "Math", grade: "Grade 4", color: "var(--desk-rose)", rating: 4.6, saves: 89, initials: "RP" },
+                      { title: "Story Builders", subject: "ELA", grade: "Grade 3", color: "var(--desk-sage)", rating: 4.9, saves: 203, initials: "LD" },
+                      { title: "History Timeline", subject: "Social Studies", grade: "Grade 6", color: "var(--desk-accent)", rating: 4.7, saves: 67, initials: "MH" },
+                    ].map((card, i) => (
+                      <div
+                        key={card.title}
+                        className="storefront-card magnetic-card rounded-lg border p-2.5 flex flex-col gap-1.5"
+                        style={{
+                          borderColor: "var(--desk-border)",
+                          background: "var(--desk-paper)",
+                          animationDelay: `${i * 0.15}s`,
+                        }}
+                      >
+                        {/* Card color strip */}
+                        <div className="h-1 w-full rounded-full" style={{ background: card.color, opacity: 0.6 }} />
+                        {/* Subject & grade pills */}
+                        <div className="flex items-center gap-1 flex-wrap">
+                          <span className="text-[7px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-sm" style={{ background: `color-mix(in srgb, ${card.color} 12%, transparent)`, color: card.color }}>
+                            {card.subject}
+                          </span>
+                          <span className="text-[7px] font-medium px-1 py-0.5 rounded-sm" style={{ background: "color-mix(in srgb, var(--desk-border) 40%, transparent)", color: "var(--desk-muted)" }}>
+                            {card.grade}
+                          </span>
+                        </div>
+                        {/* Title */}
+                        <p className="text-[10px] font-bold leading-tight" style={{ fontFamily: "var(--font-fraunces)", color: "var(--desk-ink)" }}>
+                          {card.title}
+                        </p>
+                        {/* Rating & saves row */}
+                        <div className="flex items-center justify-between mt-auto pt-1" style={{ borderTop: "1px solid color-mix(in srgb, var(--desk-border) 50%, transparent)" }}>
+                          <div className="flex items-center gap-0.5">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <svg key={star} viewBox="0 0 16 16" className="w-2.5 h-2.5" fill={star <= Math.floor(card.rating) ? card.color : "none"} stroke={card.color} strokeWidth="1.5">
+                                <path d="M8 1.5l2 4.1 4.5.6-3.25 3.2.77 4.5L8 11.7l-4.02 2.2.77-4.5L1.5 6.2l4.5-.6L8 1.5z" />
+                              </svg>
+                            ))}
+                            <span className="text-[8px] font-bold ml-0.5" style={{ color: "var(--desk-muted)" }}>{card.rating}</span>
+                          </div>
+                          <div className="flex items-center gap-0.5">
+                            <svg viewBox="0 0 24 24" fill="none" className="w-2.5 h-2.5" stroke="var(--desk-muted)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M19 21l-7-5-7 5V5a2 2 0 012-2h10a2 2 0 012 2z" />
+                            </svg>
+                            <span className="text-[8px] font-medium" style={{ color: "var(--desk-muted)" }}>{card.saves}</span>
+                          </div>
+                        </div>
+                        {/* Author */}
+                        <div className="flex items-center gap-1">
+                          <div className="w-3.5 h-3.5 rounded-full flex items-center justify-center text-[6px] font-bold text-white" style={{ background: card.color }}>
+                            {card.initials}
+                          </div>
+                          <div className="flex-1 h-0.75 rounded-full" style={{ background: "color-mix(in srgb, var(--desk-border) 30%, transparent)" }}>
+                            <div className="h-full rounded-full storefront-bar" style={{ background: card.color, opacity: 0.5, width: `${(card.rating / 5) * 100}%` }} />
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Bottom bar with community stats */}
+                  <div className="flex items-center justify-between px-4 py-2.5 border-t" style={{ borderColor: "var(--desk-border)", background: "color-mix(in srgb, var(--desk-teal) 3%, var(--desk-paper))" }}>
+                    <div className="flex items-center gap-1">
+                      {/* Overlapping avatars */}
+                      <div className="flex -space-x-1.5">
+                        {["var(--desk-teal)", "var(--desk-rose)", "var(--desk-sage)", "var(--desk-accent)"].map((c, i) => (
+                          <div key={i} className="w-4 h-4 rounded-full border border-white flex items-center justify-center" style={{ background: c, zIndex: 4 - i }}>
+                            <svg viewBox="0 0 24 24" fill="none" className="w-2.5 h-2.5" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                              <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
+                            </svg>
+                          </div>
+                        ))}
+                      </div>
+                      <span className="text-[8px] font-semibold ml-1" style={{ color: "var(--desk-muted)" }}>2.4k educators</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="flex items-center gap-0.5 text-[8px] font-semibold" style={{ color: "var(--desk-teal)" }}>
+                        <svg viewBox="0 0 24 24" fill="none" className="w-2.5 h-2.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M23 6l-9.5 9.5-5-5L1 18" />
+                        </svg>
+                        Trending
+                      </span>
+                      <span className="glow-dot w-1.5 h-1.5 rounded-full" style={{ background: "var(--desk-sage)" }} />
+                    </div>
+                  </div>
+                </div>
               </Reveal>
             </div>
           </PaperPage>
